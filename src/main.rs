@@ -2,6 +2,8 @@ use rodio::{source, OutputStream, OutputStreamHandle, Sink, Source};
 use rodio::source::{SineWave, Mix};
 use std::time::Duration;
 
+mod parser;
+
 struct Chord {
     notes: Vec<String>,
     duration: f32,
