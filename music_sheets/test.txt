@@ -1,5 +1,7 @@
-BPM 130
+BPM 120
 
-A4 G6 A#3 G8
+MusicSheet = {
+	Note(E4, 1), Note(D4, 1), Note(C4, 1), Note(D4, 1), Note(E4, 1, 2), Note(E4, 2)
+}
 
-(300); {20}
+Play
