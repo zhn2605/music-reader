@@ -27,6 +27,7 @@ fn main() {
         }
     }
 
+    let source_code= parser::read_file(&file_name.trim()).unwrap();
     let tokens = parser::tokenize(&source_code);
     println!("{:?}", tokens);
 
