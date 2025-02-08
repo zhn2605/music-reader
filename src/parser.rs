@@ -45,7 +45,9 @@ pub fn tokenize(source_code: &str) -> Vec<TokenType> {
 
             '\n' => { line_number+=1; },
 
-            ',' => { tokens.push(TokenType::Comma) }
+            ',' => { tokens.push(TokenType::Comma); },
+
+            '=' => { tokens.push(TokenType::AssignExpr); },
 
             // Numbers
             '0'..='9' => {
@@ -78,7 +80,6 @@ pub fn tokenize(source_code: &str) -> Vec<TokenType> {
 
                 let keyword = match identifier.as_str() {
                     "BPM" => TokenType::Bpm(120.0),
-                    "let" => TokenType::AssignExpr,
                     "Play" => TokenType::Play,
                     "MusicSheet" => TokenType::MusicSheet,
                     other => {
@@ -125,13 +126,13 @@ pub fn tokenize(source_code: &str) -> Vec<TokenType> {
 }
 
 #[derive(Debug)]
-struct Note {
-    note: String,
-    duration: f64,
+pub struct Note {
+    pub note: String,
+    pub duration: f64,
 }
 
 #[derive(Debug)]
-enum AstNode {
+pub enum AstNode {
     MusicSheet {
         notes: Vec<Note>
     },
@@ -139,14 +140,14 @@ enum AstNode {
     PlayKeyword
 }
 
-struct Parser {
+pub struct Parser {
     tokens: Vec<TokenType>,
     current: usize,
 }
 
 // Parsing
 impl Parser {
-    fn new(tokens: Vec<TokenType>) -> Self {
+    pub fn new(tokens: Vec<TokenType>) -> Self {
         Parser {
             tokens,
             current: 0
@@ -163,7 +164,7 @@ impl Parser {
         self.tokens.get(self.current)
     }
 
-    fn parse_program(&mut self) -> Result<Vec<AstNode>, String> {
+    pub fn parse_program(&mut self) -> Result<Vec<AstNode>, String> {
         let mut nodes = Vec::new();
 
         while let Some(token) = self.peek() {

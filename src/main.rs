@@ -1,8 +1,11 @@
 use std::{fs::{self}, io::{self, Write}, str::Bytes};
+use parser::tokenize;
 use rodio::{source, OutputStream, OutputStreamHandle, Sink, Source};
 
 mod parser;
+use crate::parser::Parser;
 mod music;
+use crate::music::MusicSheet;
 
 fn main() {
     let (_stream, stream_handle) = OutputStream::try_default()
@@ -28,12 +31,9 @@ fn main() {
     }
 
     let source_code= parser::read_file(&file_name.trim()).unwrap();
-    let tokens = parser::tokenize(&source_code);
+    let tokens = tokenize(&source_code);
     println!("{:?}", tokens);
-
-
-
-    let melody: Vec<&str> = vec!["D4", "E4", "F4", "G4", "E4", "C4", "D4"];
-
-    music::play_melody(&stream_handle, melody);
+    
+    let mut music_sheet = MusicSheet::read(&source_code);
+    music_sheet.play_melody(&stream_handle);
 }
