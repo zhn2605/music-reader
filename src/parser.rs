@@ -4,7 +4,8 @@ use std::{fs::{File}, io::{BufReader, Read}};
 
 #[derive(Debug)]
 pub enum TokenType {
-    Note(String),
+    Note,
+    Pitch(String),
     Play,
     MusicSheet,
     Bpm(f64),
@@ -70,9 +71,10 @@ pub fn tokenize(source_code: &str) -> Vec<TokenType> {
                 let mut identifier = String::new();
                 identifier.push(ch);
 
-                while let Some(ch) = chars.next() {
+                while let Some(&ch) = chars.peek() {
                     if ch.is_ascii_alphanumeric() || ch == '#' {
                         identifier.push(ch);
+                        chars.next();
                     } else {
                         break;
                     }
@@ -82,15 +84,16 @@ pub fn tokenize(source_code: &str) -> Vec<TokenType> {
                     "BPM" => TokenType::Bpm(120.0),
                     "Play" => TokenType::Play,
                     "MusicSheet" => TokenType::MusicSheet,
+                    "Note" => TokenType::Note,
                     other => {
                         let chars: Vec<char> = other.chars().collect();
-                        println!("Chars: {:?}", chars);
+                        // println!("Chars: {:?}", chars);
                         match chars.as_slice() {
                             [note, acc, octave] if ('A'..='G').contains(note)
                                 && ['b', '#'].contains(acc)
-                                && ('0'..='8').contains(octave) => TokenType::Note(other.to_string()),
+                                && ('0'..='8').contains(octave) => TokenType::Pitch(other.to_string()),
                             [note, octave] if ('A'..='G').contains(note)
-                                && ('0'..='8').contains(octave) => TokenType::Note(other.to_string()),
+                                && ('0'..='8').contains(octave) => TokenType::Pitch(other.to_string()),
                             _ => TokenType::Identifier(other.to_string())
                         }
                     }
@@ -171,6 +174,7 @@ impl Parser {
             match token {
                 TokenType::Bpm(_) => {
                     nodes.push(self.parse_bpm()?);
+                    self.advance();
                 },
                 TokenType::MusicSheet => {
                     nodes.push(self.parse_music_sheet()?);
@@ -194,6 +198,13 @@ impl Parser {
     }
 
     fn parse_music_sheet(&mut self) -> Result<AstNode, String> {
+        // music sheets should be in this format
+        /* 
+        MusicSheet = { 
+            Note(<note>, <duration>), Note... 
+        }
+        */
+
         match self.advance() {
             Some(TokenType::MusicSheet) => (),
             _ => return Err(String::from("Expected Music Sheet"))
@@ -211,17 +222,18 @@ impl Parser {
 
         let mut notes = Vec::new();
 
-        while let Some(token) = self.peek() {
+        while let Some(token) = self.advance() {
             match token {
                 TokenType::CloseBrace => {
                     self.advance();
                     break;
                 },
-                TokenType::Note(_) => {
+                TokenType::Note => {
                     notes.push(self.parse_note()?);
                     
                     if let Some(next_token) = self.peek() {
                         match next_token {
+                            // check if valid use of , to separate notes. if at the end of music sheet
                             TokenType::CloseBrace => continue,
                             TokenType::Comma => {
                                 self.advance();
@@ -238,16 +250,23 @@ impl Parser {
     }
 
     fn parse_note(&mut self) -> Result<Note, String> {
-        let note_token = self.advance().ok_or("Expected note")?;
-
-        let note = match note_token {
-            TokenType::Note(value) => value.clone(),
-            _ => return Err(String::from("Expected note value"))
-        };
-
         match self.advance() {
             Some(TokenType::OpenParen) => (),
             _ => return Err(String::from("Expected ("))
+        }
+
+        let note_token = self.advance().ok_or("Expected pitch")?;
+        let note = match note_token {
+            TokenType::Pitch(value) => value.clone(),
+            _ => return Err(String::from("Expected pitch value"))
+        };
+
+        println!("Successfully got note: {}", note);
+
+        // comma separating params
+        match self.advance() {
+            Some(TokenType::Comma) => (),
+            _ => return Err(String::from("Expected ,"))
         }
 
         let duration = if let Some(&TokenType::Number(value)) = self.tokens.get(self.current) {
@@ -256,6 +275,8 @@ impl Parser {
         } else {
             1.0
         };
+
+        println!("Successfully got duration: {}", duration);
 
         match self.advance() {
             Some(TokenType::CloseParen) => (),

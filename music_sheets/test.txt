@@ -1,4 +1,4 @@
-BPM 120
+BPM 60
 
 MusicSheet = {
 	Note(E4, 1), Note(D4, 1), Note(C4, 1), Note(D4, 1), Note(E4, 1), Note(E4, 1), Note(E4, 2)
