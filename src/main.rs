@@ -14,6 +14,7 @@ fn main() {
     let mut file_name = String::new();
     
     // Loop until input is recieved
+    /*
     loop {
         print!("Enter file path: ");
         io::stdout().flush().unwrap();
@@ -29,8 +30,10 @@ fn main() {
             Err(_) => println!("Failed to read input. Try again."),
         }
     }
+    */
 
-    let source_code= parser::read_file(&file_name.trim()).unwrap();
+    // let source_code= parser::read_file(&file_name.trim()).unwrap();
+    let source_code = parser::read_file("music_sheets/test.txt").unwrap();
     let tokens = tokenize(&source_code);
     println!("{:?}", tokens);
     

@@ -1,7 +1,7 @@
-BPM 60
+BPM 300
 
 MusicSheet = {
-	Note(E4, 1), Note(D4, 1), Note(C4, 1), Note(D4, 1), Note(E4, 1), Note(E4, 1), Note(E4, 2)
+	Note(E5, 1), Note(D5, 1), Note(C5, 1), Note(D5, 1), Note(E5, 1), Note(E5, 1), Note(E5, 2)
 }
 
 Play

@@ -174,7 +174,6 @@ impl Parser {
             match token {
                 TokenType::Bpm(_) => {
                     nodes.push(self.parse_bpm()?);
-                    self.advance();
                 },
                 TokenType::MusicSheet => {
                     nodes.push(self.parse_music_sheet()?);
@@ -190,10 +189,16 @@ impl Parser {
         Ok(nodes)
     }
 
-    fn parse_bpm(&mut self) -> Result<AstNode, String>{
+    pub fn parse_bpm(&mut self) -> Result<AstNode, String> {
         match self.advance() {
-            Some(TokenType::Bpm(value)) => Ok(AstNode::Bpm(*value)),
-            _ => Err(String::from("Expected BPM Value"))
+            Some(TokenType::Bpm(_)) => {
+                // Look for bpm value
+                match self.advance() {
+                    Some(TokenType::Number(value)) => Ok(AstNode::Bpm(*value)),
+                    _ => Err(String::from("Expected numeric value after BPM"))
+                }
+            },
+            _ => Err(String::from("Expected BPM keyword"))
         }
     }
 
