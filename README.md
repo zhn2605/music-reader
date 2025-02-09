@@ -1,4 +1,4 @@
-# Sheet #
+# Sheet Sharp
 You can now write and play your own music in Sheet Sharp (`.ss`),  a music-like language. Sound is played through rodio.
 
 # Features
