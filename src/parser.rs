@@ -5,6 +5,7 @@ use std::{fs::{File}, io::{BufReader, Read}};
 #[derive(Debug)]
 pub enum TokenType {
     Note,
+    Chord,
     Pitch(String),
     Play,
     MusicSheet,

@@ -1,5 +1,5 @@
-use rodio::{source, OutputStream, OutputStreamHandle, Sink, Source};
-use rodio::source::{SineWave, Mix};
+use rodio::{Sink, Source};
+use rodio::source::SineWave;
 use std::time::Duration;
 use crate::parser::{tokenize, AstNode, Note, Parser};
 
